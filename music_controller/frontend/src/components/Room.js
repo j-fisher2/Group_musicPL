@@ -10,9 +10,30 @@ export default function Room() {
     roomCode: roomCode,
   });
 
+  function getRoomDetails() {
+    fetch('/api/get-room'+'?code='+roomCode)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setRoomData({
+          votesToSkip: data.votes_to_skip,
+          guestCanPause: data.guest_can_pause,
+          isHost: data.is_host,
+          roomCode: roomCode,
+        });
+      });
+  }
+
   useEffect(() => {
+    getRoomDetails();
+  }, [roomCode]); 
 
-  }, [roomCode]);
-
-  return <h1>{roomCode}</h1>;
+  return (
+    <div className="center">
+      <h1>{roomCode}</h1>
+      <h1>{roomData.votesToSkip}</h1>
+      <h1>{roomData.isHost.toString()}</h1>
+    </div>
+  );
 }
+
