@@ -14,7 +14,6 @@ export default function Room() {
     fetch('/api/get-room'+'?code='+roomCode)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setRoomData({
           votesToSkip: data.votes_to_skip,
           guestCanPause: data.guest_can_pause,
