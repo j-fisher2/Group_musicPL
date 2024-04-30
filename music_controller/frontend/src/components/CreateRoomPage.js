@@ -36,12 +36,13 @@ export default function CreateRoomPage() {
     fetch("/api/create-room", requestOptions)
       .then((res) => res.json())
       .then((data) => {
+        localStorage.setItem("code",data.code);
         navigate("/room/" + data.code);
-      });
-  };
+        });
+    };
 
   return (
-    <Grid className="center" container spacing={1}>
+    <Grid container spacing={1}>
       <Grid item xs={12} align="center">
         <Typography component="h4" variant="h4">
           Create a Room

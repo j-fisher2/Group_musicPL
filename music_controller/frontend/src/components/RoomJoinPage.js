@@ -23,6 +23,7 @@ export default function RoomJoinPage() {
     fetch("/api/join-room", requestOptions)
       .then((res) => {
         if (res.ok) {
+          localStorage.setItem("code",roomCode);
           navigate("/room/" + roomCode);
         } else {
           setError("Room not found");
