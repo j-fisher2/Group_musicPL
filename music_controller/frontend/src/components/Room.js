@@ -11,6 +11,7 @@ export default function Room() {
     guestCanPause: false,
     isHost: false,
     roomCode: roomCode,
+    showSettings:false,
   });
 
   function getRoomDetails() {
@@ -40,6 +41,24 @@ export default function Room() {
       navigate("/");
     })
   }
+  const updateShowSettings=(value)=>{
+    setRoomData({
+      votesToSkip:roomData.votesToSkip,
+      guestCanPause:roomData.guestCanPause,
+      isHost:roomData.isHost,
+      roomCode:roomData.roomCode,
+      showSettings:value,
+    })
+  }
+
+  const renderSettingsButton=()=>{
+    return (
+      <Grid item xs={12} align="center">
+        <Button variant="contained" color="primary" onClick={()=>updateShowSettings(true)}>Settings</Button>
+      </Grid>
+    );
+
+  }
 
   useEffect(() => {
     getRoomDetails();
@@ -67,6 +86,7 @@ export default function Room() {
           Host: {roomData.isHost.toString()}
         </Typography>
       </Grid>
+      {roomData.isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">
         <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>Leave Room</Button>
       </Grid>
