@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams,Link,useNavigate } from "react-router-dom";
 import {Grid,Button,Typography} from "@material-ui/core";
+import CreateRoomPage from "./CreateRoomPage";
 
 
 export default function Room() {
@@ -59,11 +60,24 @@ export default function Room() {
     );
 
   }
+  const renderSettings=()=>{
+    return (<Grid container spacing={1}>
+      <Grid item xs={12} align="center">
+        <CreateRoomPage update={true} votesToSkip={roomData.votesToSkip} guestCanPause={roomData.guestCanPause} roomCode={roomCode} updateCallback={null}/>
+      </Grid>
+      <Grid item xs={12} align="center">
+        <Button variant="contained" color="secondary" onClick={()=>updateShowSettings(false)}>Close</Button>
+      </Grid>
+    </Grid>);
+  }
 
   useEffect(() => {
     getRoomDetails();
   }, [roomCode]); 
-
+  
+  if(roomData.showSettings){
+    return renderSettings();
+  }
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} align="center">
