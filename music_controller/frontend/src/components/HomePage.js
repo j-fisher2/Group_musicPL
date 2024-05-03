@@ -13,6 +13,16 @@ import {
 
 export default function HomePage() {
 
+  function checkExistingRoom(){
+    const code=localStorage.getItem("code");
+    if(code){
+      
+    }
+  }
+  useEffect(()=>{
+    checkExistingRoom();
+  })
+
   return (
     <Router>
       <Routes>

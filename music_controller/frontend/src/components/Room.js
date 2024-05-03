@@ -14,7 +14,30 @@ export default function Room() {
     isHost: false,
     roomCode: roomCode,
     showSettings:false,
+    spotifyAuthenticated:false,
   });
+
+  function authenticateSpotify(){
+    if(!roomData.isHost||roomData.spotifyAuthenticated){
+      console.log("authenticated");
+      return;
+    }
+    fetch('/spotify/is-authenticated').then((res)=>res.json()).then((data)=>{setRoomData({
+      votesToSkip:roomData.votesToSkip,
+      guestCanPause:roomData.guestCanPause,
+      isHost:roomData.isHost,
+      roomCode:roomData.roomCode,
+      showSettings:roomData.showSettings,
+      spotifyAuthenticated:data.status,
+    })
+    if(!data.status){
+      fetch('/spotify/get-auth-url').then((res)=>res.json()).then((data)=>{
+        console.log(data.url);
+        window.location.replace(data.url);
+      })
+    }
+  });
+  }
 
   function getRoomDetails() {
     fetch('/api/get-room'+'?code='+roomCode)
@@ -29,6 +52,8 @@ export default function Room() {
           guestCanPause: data.guest_can_pause,
           isHost: data.is_host,
           roomCode: roomCode,
+          showSettings:roomData.showSettings,
+          spotifyAuthenticated:roomData.spotifyAuthenticated
         });
       });
   }
@@ -64,6 +89,13 @@ export default function Room() {
     );
 
   }
+  const renderSpotify=()=>{
+    return (
+      <Grid item xs={12} align="center">
+        <Button variant="contained" onClick={authenticateSpotify}>Connect Spotify</Button>
+      </Grid>
+    );
+  }
   const renderSettings=()=>{
     return (<Grid container spacing={1}>
       <Grid item xs={12} align="center">
@@ -77,7 +109,7 @@ export default function Room() {
 
   useEffect(() => {
     getRoomDetails();
-  }, [roomCode]); 
+  }, []); 
   
   if(roomData.showSettings){
     return renderSettings();
@@ -108,6 +140,7 @@ export default function Room() {
       <Grid item xs={12} align="center">
         <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>Leave Room</Button>
       </Grid>
+      {roomData.isHost ? renderSpotify() : null}
     </Grid>
   );
 }
