@@ -19,17 +19,13 @@ export default function Room() {
 
   function authenticateSpotify(){
     if(!roomData.isHost||roomData.spotifyAuthenticated){
-      console.log("authenticated");
+      alert("spotify already connected")
       return;
     }
-    fetch('/spotify/is-authenticated').then((res)=>res.json()).then((data)=>{setRoomData({
-      votesToSkip:roomData.votesToSkip,
-      guestCanPause:roomData.guestCanPause,
-      isHost:roomData.isHost,
-      roomCode:roomData.roomCode,
-      showSettings:roomData.showSettings,
-      spotifyAuthenticated:data.status,
-    })
+    fetch('/spotify/is-authenticated').then((res)=>res.json()).then((data)=>{setRoomData(prevRoomData => ({
+      ...prevRoomData,
+      spotifyAuthenticated: data.status,
+    }));
     if(!data.status){
       fetch('/spotify/get-auth-url').then((res)=>res.json()).then((data)=>{
         console.log(data.url);
@@ -47,14 +43,12 @@ export default function Room() {
         }
         return res.json();})
       .then((data) => {
-        setRoomData({
+        setRoomData(prevRoomData => ({
+          ...prevRoomData,
           votesToSkip: data.votes_to_skip,
           guestCanPause: data.guest_can_pause,
           isHost: data.is_host,
-          roomCode: roomCode,
-          showSettings:roomData.showSettings,
-          spotifyAuthenticated:roomData.spotifyAuthenticated
-        });
+        }));
       });
   }
   
@@ -68,17 +62,28 @@ export default function Room() {
       navigate("/");
     })
   }
-  const updateShowSettings=(value)=>{
-    setRoomData({
-      votesToSkip:roomData.votesToSkip,
-      guestCanPause:roomData.guestCanPause,
-      isHost:roomData.isHost,
-      roomCode:roomData.roomCode,
-      showSettings:value,
-    })
-    if(!value){
-      getRoomDetails();
-    }
+  const updateShowSettings = (value) => {
+    setRoomData(prevRoomData => ({
+      ...prevRoomData,
+      showSettings: value,
+    }));
+  };
+  
+  const getCurrentSong=()=> {
+    fetch("/spotify/current-song")
+      .then((response) => {
+        if (!response.ok) {
+          return {};
+        } else {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        setRoomData(prevRoomData => ({
+          ...prevRoomData,
+          song: data
+        }));
+      });
   }
 
   const renderSettingsButton=()=>{
@@ -109,7 +114,7 @@ export default function Room() {
 
   useEffect(() => {
     getRoomDetails();
-  }, []); 
+  }, [roomData.showSettings]); 
   
   if(roomData.showSettings){
     return renderSettings();
@@ -141,6 +146,9 @@ export default function Room() {
         <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>Leave Room</Button>
       </Grid>
       {roomData.isHost ? renderSpotify() : null}
+      <Grid item xs={12} align="center">
+        <Button variant="contained" color="secondary" onClick={getCurrentSong}>Current Song</Button>
+      </Grid>
     </Grid>
   );
 }
