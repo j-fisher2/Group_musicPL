@@ -5,6 +5,8 @@ from .models import Room
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
+from django.contrib.sessions.models import Session
+from spotify.models import SpotifyToken
 
 
 class RoomView(generics.ListAPIView):
@@ -91,6 +93,13 @@ class LeaveRoom(APIView):
                 room=room_results[0]
                 room.delete()
         return Response({"message":"Success"},status=status.HTTP_200_OK)
+    
+    def destroy_session(self,id):
+        Session.objects.filter(session_key=id).delete()
+    def delete_user_token(self,id):
+        tokens=SpotifyToken.objects.filter(user=id)
+        if len(tokens):
+            tokens[0].delete()
 
 class UpdateRoom(APIView):
     serializer_class=UpdateRoomSerializer
