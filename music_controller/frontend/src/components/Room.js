@@ -3,7 +3,7 @@ import { useParams,Link,useNavigate } from "react-router-dom";
 import {Grid,Button,Typography} from "@material-ui/core";
 import CreateRoomPage from "./CreateRoomPage";
 import UpdateRoomPage from "./UpdateRoomPage";
-
+import MusicPlayer from "./MusicPlayer";
 
 export default function Room() {
   const { roomCode } = useParams();
@@ -15,11 +15,12 @@ export default function Room() {
     roomCode: roomCode,
     showSettings:false,
     spotifyAuthenticated:false,
+    song:{},
   });
 
   function authenticateSpotify(){
     if(!roomData.isHost||roomData.spotifyAuthenticated){
-      alert("spotify already connected")
+      alert("Spotify Already Connected")
       return;
     }
     fetch('/spotify/is-authenticated').then((res)=>res.json()).then((data)=>{setRoomData(prevRoomData => ({
@@ -114,6 +115,9 @@ export default function Room() {
 
   useEffect(() => {
     getRoomDetails();
+    const interval=setInterval(getCurrentSong,1000);
+
+    return () => clearInterval(interval);
   }, [roomData.showSettings]); 
   
   if(roomData.showSettings){
@@ -141,14 +145,12 @@ export default function Room() {
           Host: {roomData.isHost.toString()}
         </Typography>
       </Grid>
+      <MusicPlayer {...roomData.song}/>
       {roomData.isHost ? renderSettingsButton() : null}
       <Grid item xs={12} align="center">
         <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>Leave Room</Button>
       </Grid>
       {roomData.isHost ? renderSpotify() : null}
-      <Grid item xs={12} align="center">
-        <Button variant="contained" color="secondary" onClick={getCurrentSong}>Current Song</Button>
-      </Grid>
     </Grid>
   );
 }
