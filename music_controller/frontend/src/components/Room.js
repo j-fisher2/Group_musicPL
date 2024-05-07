@@ -60,6 +60,7 @@ export default function Room() {
     }
     fetch('/api/leave-room',request).then((res)=>{
       localStorage.removeItem("code");
+      fetch('/api/destroy-session');
       navigate("/");
     })
   }
